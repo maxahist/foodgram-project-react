@@ -1,0 +1,126 @@
+from django.db import models
+
+from users.models import User
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=200,
+                            verbose_name='название')
+    color = models.CharField(max_length=7,
+                             verbose_name='цвет')
+    slug = models.SlugField(unique=True,
+                            verbose_name='слаг',
+                            max_length=200)
+
+    class Meta:
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.slug
+
+
+class Food(models.Model):
+    name = models.CharField(max_length=200,
+                            verbose_name='название продукта')
+    measurement_unit = models.CharField(max_length=200,
+                                        verbose_name='единица измерения')
+
+    class Meta:
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+
+class Recipe(models.Model):
+    author = models.ForeignKey(User,
+                               on_delete=models.CASCADE,
+                               verbose_name='автор',
+                               related_name='recipe',
+                               )
+    name = models.CharField(max_length=255,
+                            verbose_name='название')
+    image = models.ImageField('image',
+                              upload_to='food/',
+                              blank=True)
+    text = models.TextField(verbose_name='описание')
+    ingredients = models.ManyToManyField(Food,
+                                         verbose_name='ингридиеты',
+                                         through='FoodRecipe')
+    tags = models.ManyToManyField(Tag,
+                                  verbose_name='тэг',
+                                  through='TagRecipe')
+    cooking_time = models.IntegerField(verbose_name='время приготовления')
+    pub_date = models.DateTimeField(verbose_name='дата',
+                                    auto_now_add=True)
+
+    class Meta:
+        ordering = ('-pub_date',)
+
+    def __str__(self):
+        return self.name
+
+    # object = RecipeQuerySet.as_manager()
+
+
+class TagRecipe(models.Model):
+    tag = models.ForeignKey(Tag,
+                            on_delete=models.CASCADE,
+                            related_name='tagr',
+                            verbose_name='тэг')
+    recipe = models.ForeignKey(Recipe,
+                               on_delete=models.CASCADE,
+                               related_name='tagr',
+                               verbose_name='рецепт')
+
+
+class FoodRecipe(models.Model):
+    food = models.ForeignKey(Food,
+                             on_delete=models.CASCADE,
+                             verbose_name='ингредиенты',
+                             related_name='food')
+    recipe = models.ForeignKey(Recipe,
+                               on_delete=models.CASCADE,
+                               related_name='recipe',
+                               verbose_name='рецепт')
+    amount = models.SmallIntegerField(verbose_name='колтичество', default=1)
+
+
+class ShoppingBasket(models.Model):
+    recipe = models.ForeignKey(Recipe,
+                               verbose_name='рецепт',
+                               related_name='cart',
+                               on_delete=models.CASCADE)
+    user = models.ForeignKey(User,
+                             verbose_name='пользователь',
+                             related_name='cart',
+                             on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(
+            fields=['recipe', 'user'],
+            name='уже в корзине'
+        )]
+
+    def __str__(self):
+        return f'{self.recipe} в корзине у {self.user}'
+
+
+class Favorites(models.Model):
+    recipe = models.ForeignKey(Recipe,
+                               verbose_name='рецепт',
+                               related_name='favorites',
+                               on_delete=models.CASCADE)
+    user = models.ForeignKey(User,
+                             verbose_name='пользователь',
+                             related_name='favorites',
+                             on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(
+            fields=['recipe', 'user'],
+            name='уже в избранном'
+        )]
+
+    def __str__(self):
+        return f'{self.recipe} в избранном у {self.user}'

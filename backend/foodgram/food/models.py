@@ -14,6 +14,8 @@ class Tag(models.Model):
 
     class Meta:
         ordering = ('name',)
+        verbose_name = 'тэг'
+        verbose_name_plural = 'тэги'
 
     def __str__(self):
         return self.slug
@@ -27,6 +29,8 @@ class Food(models.Model):
 
     class Meta:
         ordering = ('name',)
+        verbose_name = 'ингредиент'
+        verbose_name_plural = 'ингредиенты'
 
     def __str__(self):
         return self.name
@@ -41,8 +45,7 @@ class Recipe(models.Model):
     name = models.CharField(max_length=255,
                             verbose_name='название')
     image = models.ImageField('image',
-                              upload_to='food/',
-                              blank=True)
+                              upload_to='food/')
     text = models.TextField(verbose_name='описание')
     ingredients = models.ManyToManyField(Food,
                                          verbose_name='ингридиеты',
@@ -56,11 +59,11 @@ class Recipe(models.Model):
 
     class Meta:
         ordering = ('-pub_date',)
+        verbose_name = 'рецепт'
+        verbose_name_plural = 'рецепты'
 
     def __str__(self):
         return self.name
-
-    # object = RecipeQuerySet.as_manager()
 
 
 class TagRecipe(models.Model):
@@ -73,6 +76,13 @@ class TagRecipe(models.Model):
                                related_name='tagr',
                                verbose_name='рецепт')
 
+    class Meta:
+        verbose_name = 'тэг в рецеате'
+        verbose_name_plural = 'тэги в рецептах'
+
+    def __str__(self):
+        return f'{self.tag} в {self.recipe}'
+
 
 class FoodRecipe(models.Model):
     food = models.ForeignKey(Food,
@@ -84,6 +94,13 @@ class FoodRecipe(models.Model):
                                related_name='recipe',
                                verbose_name='рецепт')
     amount = models.SmallIntegerField(verbose_name='колтичество', default=1)
+
+    class Meta:
+        verbose_name = 'ингредиент в рецепте'
+        verbose_name_plural = 'ингредиенты в рецептах'
+
+    def __str__(self):
+        return f'в {self.recipe} {self.amount} {self.food}'
 
 
 class ShoppingBasket(models.Model):
@@ -101,6 +118,8 @@ class ShoppingBasket(models.Model):
             fields=['recipe', 'user'],
             name='уже в корзине'
         )]
+        verbose_name = 'карзина покупок'
+        verbose_name_plural = 'карзины покупок'
 
     def __str__(self):
         return f'{self.recipe} в корзине у {self.user}'
@@ -121,6 +140,8 @@ class Favorites(models.Model):
             fields=['recipe', 'user'],
             name='уже в избранном'
         )]
+        verbose_name = 'избранный рецепт'
+        verbose_name_plural = 'избранные рецепты'
 
     def __str__(self):
         return f'{self.recipe} в избранном у {self.user}'

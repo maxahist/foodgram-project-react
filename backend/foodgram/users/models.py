@@ -4,6 +4,10 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 
+from core.constants import (ADMIN,
+                            AUTH_USER,
+                            GUEST)
+
 
 class CustomUserManager(UserManager):
     def create_superuser(self, username, email, password, **extra_fields):
@@ -17,9 +21,9 @@ class CustomUserManager(UserManager):
 
 class User(AbstractUser):
     USER_TYPE_CHOICES = (
-        ('admin', 'Admin'),
-        ('guest', 'Guest'),
-        ('user', 'User')
+        (ADMIN, 'Admin'),
+        (GUEST, 'Guest'),
+        (AUTH_USER, 'User')
     )
     role = models.CharField(choices=USER_TYPE_CHOICES,
                             max_length=255,
@@ -47,14 +51,16 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == 'admin'
+        return self.role == ADMIN
 
     @property
-    def is_moderator(self):
-        return self.role == 'user'
+    def is_auth_user(self):
+        return self.role == AUTH_USER
 
     class Meta:
         ordering = ('-id',)
+        verbose_name = 'пользователь'
+        verbose_name_plural = 'пользователи'
 
     def __str__(self):
         return self.username
@@ -76,3 +82,9 @@ class Subscription(models.Model):
             fields=['author', 'sub'],
             name='нельзя подписаться на себя'
         )]
+
+        verbose_name = 'подписка'
+        verbose_name_plural = 'подписки'
+
+    def __str__(self):
+        return f'{self.sub} подписан на {self.author}'

@@ -1,8 +1,8 @@
-from api.serializers import Base64ImageField
 from django.contrib.auth import get_user_model
-from food.models import Recipe
 from rest_framework import serializers
 
+from api.serializers import Base64ImageField
+from food.models import Recipe
 from .models import Subscription, User
 
 User = get_user_model()
@@ -21,6 +21,18 @@ class UserSerializer(serializers.ModelSerializer):
         username = self.context.get('request').user
         return Subscription.objects.filter(sub__username=username,
                                            author=obj.id).exists()
+
+    def validate(self, obj):
+        if self.initial_data.get('username') == 'me':
+            raise serializers.ValidationError(
+                'выберите другоe имя пользователя')
+        username = self.initial_data.get('username')
+        email = self.initial_data.get('email')
+        if User.objects.filter(username=username):
+            raise serializers.ValidationError('данное имя уже занято')
+        if User.objects.filter(email=email):
+            raise serializers.ValidationError('данная почта уже зарегистрирована')
+        return obj
 
     def create(self, validated_data):
         user = User(

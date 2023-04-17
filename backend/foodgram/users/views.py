@@ -1,13 +1,13 @@
-from api.paginations import CustomPaginator
-from api.views import IsAuthenticated
 from djoser.views import UserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from .models import User, Subscription
-from .serializers import (SubSerializer)
+from api.paginations import CustomPaginator
+from api.views import IsAuthenticated
+from .models import Subscription, User
+from .serializers import SubSerializer
 
 
 class UserViewSet(UserViewSet):
@@ -40,18 +40,12 @@ class UserViewSet(UserViewSet):
         user = request.user
         author = get_object_or_404(User, id=id)
         if self.request.method == 'POST':
-            if Subscription.objects.filter(sub=user,
-                                           author=author).exists():
-                return Response('exists', status=status.HTTP_400_BAD_REQUEST)
             sub = Subscription.objects.create(sub=user,
                                               author=author)
             serializer = SubSerializer(sub)
             return Response(serializer.data)
         if self.request.method == 'DELETE':
-            if Subscription.objects.filter(sub=user,
-                                           author=author).exists():
-                follow = get_object_or_404(Subscription, sub=user,
-                                           author=author)
-                follow.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            follow = get_object_or_404(Subscription, sub=user,
+                                       author=author)
+            follow.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)

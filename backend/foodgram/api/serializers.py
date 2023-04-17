@@ -1,12 +1,13 @@
 from django.db.models import F
 from drf_extra_fields.fields import Base64ImageField
-from food.models import (Food,
-                         Tag,
-                         Recipe,
-                         FoodRecipe,
-                         ShoppingBasket,
-                         Favorites)
 from rest_framework import serializers
+
+from food.models import (Favorites,
+                         Food,
+                         FoodRecipe,
+                         Recipe,
+                         ShoppingBasket,
+                         Tag,)
 from users.serializers import UserSerializer
 
 
@@ -33,9 +34,16 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('id', 'tags', 'author', 'ingredients',
-                  'is_favorited', 'is_in_shopping_cart',
-                  'name', 'image', 'text', 'cooking_time')
+        fields = ('id',
+                  'tags',
+                  'author',
+                  'ingredients',
+                  'is_favorited',
+                  'is_in_shopping_cart',
+                  'name',
+                  'image',
+                  'text',
+                  'cooking_time')
 
     def get_ingredients(self, obj):
         ingredients = obj.ingredients.values(
@@ -45,15 +53,15 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         user = self.context['request'].user
-        if user.is_anonymous:
-            return False
-        return obj.favorites.filter(user=user).exists()
+        if not user.is_anonymous and obj.favorites.filter(user=user).exists():
+            return True
+        return False
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
-        if user.is_anonymous:
-            return False
-        return obj.cart.filter(user=user).exists()
+        if not user.is_anonymous and obj.cart.filter(user=user).exists():
+            return True
+        return False
 
     def validate(self, data):
         tags = self.initial_data.get('tags')
@@ -66,13 +74,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         return data
 
     def create_ingredients(self, recipe, ingredients):
-        for ingredient in ingredients:
-            FoodRecipe.objects.bulk_create([
-                FoodRecipe(
-                    recipe=recipe,
-                    food_id=ingredient.get('id'),
-                    amount=ingredient.get('amount'))
-            ])
+        irgredient_list = []
+        for item in ingredients:
+            ingredient = FoodRecipe(recipe,
+                                    food_id=item.get('id'),
+                                    amount=item.get('amount'))
+            irgredient_list.append(ingredient)
+        FoodRecipe.objects.bulk_create(irgredient_list)
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')

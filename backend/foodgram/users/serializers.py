@@ -1,11 +1,8 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from api.serializers import Base64ImageField
 from food.models import Recipe
 from .models import Subscription, User
-
-User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -13,8 +10,13 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'is_subscribed', 'password')
+        fields = ('email',
+                  'id',
+                  'username',
+                  'first_name',
+                  'last_name',
+                  'is_subscribed',
+                  'password')
         extra_kwargs = {'password': {'write_only': 'True'}}
 
     def get_is_subscribed(self, obj):
@@ -51,7 +53,10 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
+        fields = ('id',
+                  'name',
+                  'image',
+                  'cooking_time')
 
 
 class SubSerializer(UserSerializer):
@@ -65,9 +70,13 @@ class SubSerializer(UserSerializer):
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
-        fields = ('email', 'id', 'username',
-                  'first_name', 'last_name',
-                  'is_subscribed', 'recipes',
+        fields = ('email',
+                  'id',
+                  'username',
+                  'first_name',
+                  'last_name',
+                  'is_subscribed',
+                  'recipes',
                   'recipes_count')
         model = Subscription
 

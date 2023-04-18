@@ -4,9 +4,9 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 
-from core.constants import (ADMIN,
-                            AUTH_USER,
-                            GUEST)
+from .constants import (ADMIN,
+                        AUTH_USER,
+                        GUEST)
 
 
 class CustomUserManager(UserManager):
@@ -49,6 +49,11 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
 
+    class Meta:
+        ordering = ('-id',)
+        verbose_name = 'пользователь'
+        verbose_name_plural = 'пользователи'
+
     @property
     def is_admin(self):
         return self.role == ADMIN
@@ -56,11 +61,6 @@ class User(AbstractUser):
     @property
     def is_auth_user(self):
         return self.role == AUTH_USER
-
-    class Meta:
-        ordering = ('-id',)
-        verbose_name = 'пользователь'
-        verbose_name_plural = 'пользователи'
 
     def __str__(self):
         return self.username

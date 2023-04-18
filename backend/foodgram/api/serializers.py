@@ -21,7 +21,9 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Tag
-        read_only_fields = ['name', 'color', 'slug']
+        read_only_fields = ['name',
+                            'color',
+                            'slug']
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -53,15 +55,11 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         user = self.context['request'].user
-        if not user.is_anonymous and obj.favorites.filter(user=user).exists():
-            return True
-        return False
+        return user.is_anonymous and obj.favorites.filter(user=user).exists()
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
-        if not user.is_anonymous and obj.cart.filter(user=user).exists():
-            return True
-        return False
+        return not user.is_anonymous and obj.cart.filter(user=user).exists()
 
     def validate(self, data):
         tags = self.initial_data.get('tags')
@@ -113,7 +111,10 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ShoppingBasket
-        fields = ('id', 'name', 'image', 'cooking_time')
+        fields = ('id',
+                  'name',
+                  'image',
+                  'cooking_time')
 
 
 class FavoriteSerializer(serializers.ModelSerializer):

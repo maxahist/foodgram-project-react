@@ -6,7 +6,25 @@
 Добовлять конкретные рецепты в изюронное, а так же в корзину покупок.
 
 ### установка на сервер 
-coming soon...
+* установите docker и docker-compose
+* создайте файл .env 
+#### пример заполнения env файла
+```commandline
+DB_ENGINE=django.db.backends.postgresql 
+DB_NAME=postgres 
+POSTGRES_USER=postgres 
+POSTGRES_PASSWORD=password 
+DB_HOST=db 
+DB_PORT=5432 
+SECRET_KEY=secretkey 
+```
+* запустите docker-compose ```docker-compose up -d --build```
+* создаем миграции, суперпользователя, достаем статику
+```commandline
+docker-compose exec backend python manage.py migrate
+docker-compose exec backend python manage.py createsuperuser
+docker-compose exec backend python manage.py collectstatic --no-input
+```
 
 
 ### технолонии

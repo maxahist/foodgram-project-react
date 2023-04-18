@@ -90,7 +90,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
     def download_shopping_cart(self, request):
         user = request.user
-        # shop_cart = ShoppingBasket.objects.prefetch_related('recipe').filter(user=user)
         shop_cart = ShoppingBasket.objects.filter(user=user)
         if not shop_cart.exists():
             return Response('нет рецептов в корзине', status=status.HTTP_400_BAD_REQUEST)

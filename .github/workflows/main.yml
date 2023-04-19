@@ -41,7 +41,7 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            sudo docker-compose pull maxahist/foodgram:latest
+            sudo docker pull maxahist/foodgram:latest
             sudo docker-compose stop
             sudo docker-compose rm -f backend
             sudo docker-compose up -d --build

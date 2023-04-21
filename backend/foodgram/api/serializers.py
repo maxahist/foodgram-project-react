@@ -1,3 +1,5 @@
+import logging
+
 from django.db.models import F
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
@@ -55,7 +57,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         user = self.context['request'].user
-        return user.is_anonymous and obj.favorites.filter(user=user).exists()
+        return not user.is_anonymous and obj.favorites.filter(user=user).exists()
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
@@ -74,7 +76,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     def create_ingredients(self, recipe, ingredients):
         irgredient_list = []
         for item in ingredients:
-            ingredient = FoodRecipe(recipe,
+            logging.info(item)
+            ingredient = FoodRecipe(recipe=recipe,
                                     food_id=item.get('id'),
                                     amount=item.get('amount'))
             irgredient_list.append(ingredient)

@@ -16,9 +16,9 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
-# CSRF_TRUSTED_ORIGINS = ['http://localhost']
-#
-# CORS_ORIGIN_WHITELIST = ['http://localhost']
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://84.201.139.213']
+
+CORS_ORIGIN_WHITELIST = ['http://localhost', 'http://84.201.139.213']
 
 # Application definition
 

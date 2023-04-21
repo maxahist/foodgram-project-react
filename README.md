@@ -26,6 +26,10 @@ docker-compose exec backend python manage.py createsuperuser
 docker-compose exec backend python manage.py collectstatic --no-input
 ```
 
+### проект развернут
+![example workflow](https://github.com/maxahist/foodgram-project-react/actions/workflows/yamdb_workflow.yml/badge.svg)
+
+http://84.201.139.213
 
 ### технолонии
 * Python

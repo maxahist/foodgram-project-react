@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
@@ -15,7 +16,8 @@ from food.models import (Food,
                          ShoppingBasket,
                          Tag)
 
-from .filters import RecipeFilter
+from .filters import (FoodFilter,
+                      RecipeFilter)
 from .paginations import CustomPaginator
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (CartSerializer,
@@ -29,6 +31,10 @@ class FoodViewSet(viewsets.ModelViewSet):
     queryset = Food.objects.all()
     serializer_class = FoodSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    search_fields = ('^name',)
+    filterset_class = FoodFilter
+
 
 
 class TagViewSet(viewsets.ModelViewSet):

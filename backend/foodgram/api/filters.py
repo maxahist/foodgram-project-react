@@ -1,4 +1,5 @@
 from django_filters.rest_framework import filters, FilterSet
+from rest_framework.filters import SearchFilter
 
 from food.models import Recipe
 
@@ -11,10 +12,13 @@ class RecipeFilter(FilterSet):
     is_in_shopping_cart = filters.BooleanFilter(
         method='filter_is_in_shopping_cart'
     )
+    ingredients = filters.CharFilter()
 
     class Meta:
         model = Recipe
-        fields = ('author', 'tags', 'is_favorited')
+        fields = ('author',
+                  'tags',
+                  'is_favorited')
 
     def filter_favorites(self, queryset, name, value):
         if value:
@@ -25,3 +29,8 @@ class RecipeFilter(FilterSet):
         if value:
             return queryset.filter(cart__user=self.request.user)
         return queryset
+
+
+class FoodFilter(FilterSet):
+    name = filters.CharFilter(field_name='name',
+                              lookup_expr='icontains')

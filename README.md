@@ -31,6 +31,10 @@ docker-compose exec backend python manage.py collectstatic --no-input
 
 http://84.201.139.213
 
+superuser:
+* login: admin
+* passworg: admin
+
 ### технолонии
 * Python
 * Docker

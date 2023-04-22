@@ -72,7 +72,9 @@ class RecipeSerializer(serializers.ModelSerializer):
     def create_ingredients(self, recipe, ingredients):
         irgredient_list = []
         for item in ingredients:
-            logging.info(item)
+            if item.get('amount') == 0:
+                raise serializers.ValidationError(
+                    'колтчество ингредиента не может быть 0 ')
             ingredient = FoodRecipe(recipe=recipe,
                                     food_id=item.get('id'),
                                     amount=item.get('amount'))

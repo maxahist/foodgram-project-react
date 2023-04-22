@@ -60,9 +60,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate(self, data):
         tags = self.initial_data.get('tags')
         ingredients = self.initial_data.get('ingredients')
-        for ingredient, amount in ingredients:
-            if amount == 0:
-                raise serializers.ValidationError('no null')
+        for ing in ingredients:
+            if ing['amount'] <= 0:
+                raise serializers.ValidationError(
+                    'кол-во не может быть 0 и меньше')
         data.update({
             'tags': tags,
             'ingredients': ingredients,
@@ -73,9 +74,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     def create_ingredients(self, recipe, ingredients):
         irgredient_list = []
         for item in ingredients:
-            if item.get('amount') == 0:
-                raise serializers.ValidationError(
-                    'колтчество ингредиента не может быть 0 ')
             ingredient = FoodRecipe(recipe=recipe,
                                     food_id=item.get('id'),
                                     amount=item.get('amount'))

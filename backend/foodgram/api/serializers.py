@@ -61,9 +61,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags = self.initial_data.get('tags')
         ingredients = self.initial_data.get('ingredients')
         for ing in ingredients:
-            if ing['amount'] <= 0:
+            if int(ing['amount']) <= 0:
                 raise serializers.ValidationError(
-                    'кол-во не может быть 0 и меньше')
+                    'количество ингредиента не может быть 0 и меньше')
         data.update({
             'tags': tags,
             'ingredients': ingredients,

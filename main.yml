@@ -18,7 +18,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd backend/foodgram/
           python -m pip install --upgrade pip
           pip install flake8 
           pip install -r requirements.txt
@@ -26,11 +25,11 @@ jobs:
       - name: Test with flake8 and django tests
         run: |
           python -m flake8
-          cd foodgram/
-          python manage.py test
+
 
   build_and_push_to_docker_hub:
     name: Push Docker image to Docker Hub
+    needs: test
     runs-on: ubuntu-latest
     if: github.ref_name == 'main' || github.ref_name == 'master'
     steps:

@@ -1,5 +1,7 @@
 ![](frontend/public/favicon.png)
 
+![example workflow](https://github.com/maxahist/foodgram-project-react/actions/workflows/main.yml/badge.svg)
+
 ## проект foodgram
 Социальная сеть основанная на рецептах и взаимодействии с ними.
 Можно выкладывать свои рецепты, находить интересных авторов и подписываться на них.
@@ -27,7 +29,6 @@ docker-compose exec backend python manage.py collectstatic --no-input
 ```
 
 ### проект развернут
-![example workflow](https://github.com/maxahist/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 
 http://84.201.139.213
 

@@ -2,14 +2,9 @@ import logging
 
 from django.db.models import F
 from drf_extra_fields.fields import Base64ImageField
+from food.models import (Favorites, Food, FoodRecipe, Recipe, ShoppingBasket,
+                         Tag)
 from rest_framework import serializers
-
-from food.models import (Favorites,
-                         Food,
-                         FoodRecipe,
-                         Recipe,
-                         ShoppingBasket,
-                         Tag,)
 from users.serializers import UserSerializer
 
 
@@ -50,18 +45,19 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'cooking_time')
 
     def get_ingredients(self, obj):
-        ingredients = obj.ingredients.values(
+        return obj.ingredients.values(
             'id', 'name', 'measurement_unit', amount=F('food__amount')
         )
-        return ingredients
 
     def get_is_favorited(self, obj):
         user = self.context['request'].user
-        return not user.is_anonymous and obj.favorites.filter(user=user).exists()
+        return not user.is_anonymous and obj.favorites.filter(
+            user=user).exists()
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
-        return not user.is_anonymous and obj.cart.filter(user=user).exists()
+        return not user.is_anonymous and obj.cart.filter(
+            user=user).exists()
 
     def validate(self, data):
         tags = self.initial_data.get('tags')

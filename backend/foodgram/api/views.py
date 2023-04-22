@@ -1,30 +1,20 @@
 from django.db.models import Sum
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, status
+from food.models import (Favorites, Food, FoodRecipe, Recipe, ShoppingBasket,
+                         Tag)
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
-from food.models import (Food,
-                         Favorites,
-                         FoodRecipe,
-                         Recipe,
-                         ShoppingBasket,
-                         Tag)
-
-from .filters import (FoodFilter,
-                      RecipeFilter)
+from .filters import FoodFilter, RecipeFilter
 from .paginations import CustomPaginator
 from .permissions import IsOwnerOrReadOnly
-from .serializers import (CartSerializer,
-                          FavoriteSerializer,
-                          FoodSerializer,
-                          RecipeSerializer,
-                          TagSerializer)
+from .serializers import (CartSerializer, FavoriteSerializer, FoodSerializer,
+                          RecipeSerializer, TagSerializer)
 
 
 class FoodViewSet(viewsets.ModelViewSet):
@@ -34,7 +24,6 @@ class FoodViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     search_fields = ('^name',)
     filterset_class = FoodFilter
-
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -66,11 +55,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
                                                  recipe=recipe)
             serializer = CartSerializer(cart)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if self.request.method == 'DELETE':
-            cart = get_object_or_404(ShoppingBasket, user=user,
-                                     recipe=recipe)
-            cart.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        cart = get_object_or_404(ShoppingBasket, user=user,
+                                 recipe=recipe)
+        cart.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True,
             methods=['POST', 'DELETE'],
@@ -84,11 +73,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
                                                 recipe=recipe)
             serializer = FavoriteSerializer(favorite)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if self.request.method == 'DELETE':
-            favorite = get_object_or_404(Favorites, user=user,
-                                         recipe=recipe)
-            favorite.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        favorite = get_object_or_404(Favorites, user=user,
+                                     recipe=recipe)
+        favorite.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False,
             methods=['GET'],
@@ -98,10 +87,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = request.user
         shop_cart = ShoppingBasket.objects.filter(user=user)
         if not shop_cart.exists():
-            return Response('нет рецептов в корзине', status=status.HTTP_400_BAD_REQUEST)
+            return Response('нет рецептов в корзине',
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        food = shop_cart.values_list('recipe__ingredients')
-        recipe = shop_cart.values_list('recipe')
         ingrediets = FoodRecipe.objects.filter(
             recipe__cart__user=user).values('food__name',
                                             'food__measurement_unit').annotate(
@@ -116,8 +104,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         content = ('shopping_list \n')
         for key, value in food_dict.items():
             content += (f'{key}: {value} \n')
-        return HttpResponse(content,
-                            headers={'Content-Type': 'text/plain',
-                                     'Content-Disposition': 'attachment;'
-                                                            'filename="food_to_buy.txt"'}
-                            )
+        return HttpResponse(
+            content, headers={
+                'Content-Type': 'text/plain',
+                'Content-Disposition': 'attachment;'
+                                       'filename="food_to_buy.txt"'}
+        )

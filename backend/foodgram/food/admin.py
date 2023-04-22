@@ -1,13 +1,8 @@
 from django.contrib import admin
 from django.contrib.admin import StackedInline
 
-from .models import (ShoppingBasket,
-                     Food,
-                     Tag,
-                     Recipe,
-                     TagRecipe,
-                     FoodRecipe,
-                     Favorites)
+from .models import (Favorites, Food, FoodRecipe, Recipe, ShoppingBasket, Tag,
+                     TagRecipe)
 
 
 class FoodInline(StackedInline):

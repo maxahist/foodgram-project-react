@@ -1,12 +1,12 @@
+from api.paginations import CustomPaginator
+from api.views import IsAuthenticated
 from djoser.views import UserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from api.paginations import CustomPaginator
-from api.views import IsAuthenticated
-from api.permissions import IsOwnerOrReadOnly
 from .models import Subscription, User
 from .serializers import SubSerializer
 
@@ -15,7 +15,7 @@ class UserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer = SubSerializer
     pagination_class = CustomPaginator
-    permission_classes = (IsOwnerOrReadOnly,)
+    permission_classes = (AllowAny,)
 
     @action(
         detail=False,
@@ -46,8 +46,8 @@ class UserViewSet(UserViewSet):
                                               author=author)
             serializer = SubSerializer(sub)
             return Response(serializer.data)
-        if self.request.method == 'DELETE':
-            follow = get_object_or_404(Subscription, sub=user,
-                                       author=author)
-            follow.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        follow = get_object_or_404(Subscription, sub=user,
+                                   author=author)
+        follow.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

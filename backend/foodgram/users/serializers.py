@@ -1,7 +1,7 @@
-from rest_framework import serializers
-
 from api.serializers import Base64ImageField
 from food.models import Recipe
+from rest_framework import serializers
+
 from .models import Subscription, User
 
 
@@ -33,7 +33,8 @@ class UserSerializer(serializers.ModelSerializer):
         if User.objects.filter(username=username):
             raise serializers.ValidationError('данное имя уже занято')
         if User.objects.filter(email=email):
-            raise serializers.ValidationError('данная почта уже зарегистрирована')
+            raise serializers.ValidationError(
+                'данная почта уже зарегистрирована')
         return obj
 
     def create(self, validated_data):

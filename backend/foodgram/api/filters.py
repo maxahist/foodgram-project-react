@@ -1,6 +1,4 @@
-from django_filters.rest_framework import filters, FilterSet
-from rest_framework.filters import SearchFilter
-
+from django_filters.rest_framework import FilterSet, filters
 from food.models import Recipe
 
 

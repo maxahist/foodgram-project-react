@@ -43,8 +43,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'cooking_time')
 
     def get_ingredients(self, obj):
-        if obj.ingredients['amount'] == 0:
-            return serializers.ValidationError('не 0')
         return obj.ingredients.values(
             'id', 'name', 'measurement_unit', amount=F('food__amount')
         )
@@ -62,6 +60,9 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate(self, data):
         tags = self.initial_data.get('tags')
         ingredients = self.initial_data.get('ingredients')
+        for ingredient, amount in ingredients:
+            if amount == 0:
+                raise serializers.ValidationError('no null')
         data.update({
             'tags': tags,
             'ingredients': ingredients,
